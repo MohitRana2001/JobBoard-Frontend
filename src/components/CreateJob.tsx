@@ -17,9 +17,12 @@ export default function CreateJob() {
   const { register, handleSubmit, control, formState: { errors } } = useForm<FormData>();
   const [candidates, setCandidates] = useState<string[]>([]);
   const [newCandidate, setNewCandidate] = useState('');
+  // @ts-ignore
   const [err, setErr] = useState<string | null>(null);
   const navigate = useNavigate();
 
+
+  
   const onSubmit = async (data: FormData) => {
     console.log({ ...data, candidates });
     try{
