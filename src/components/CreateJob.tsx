@@ -33,7 +33,7 @@ export default function CreateJob() {
             return;
         }
         console.log(token);
-        const response = await axios.post(`${apiUrl}/api/jobs`,{...data,candidates},{
+        const response = await axios.post(apiUrl + "/api/jobs",{...data,candidates},{
             headers:{
                 'x-auth-token': token
             }

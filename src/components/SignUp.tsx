@@ -37,7 +37,7 @@ const SignUp: React.FC = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await axios.post(`${apiUrl}/api/auth/register`, data);
+      const response = await axios.post(apiUrl +  "/api/auth/register", data);
       if (response.status === 201) {
         navigate('/verify', { state: { companyEmail: data.companyEmail, phone: data.phone } });
       }

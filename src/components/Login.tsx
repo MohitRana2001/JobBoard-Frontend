@@ -25,7 +25,7 @@ const Login: React.FC = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await axios.post(`${apiUrl}/api/auth/login`, data);
+      const response = await axios.post(apiUrl +  "/api/auth/login", data);
       console.log(response.data);
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);

@@ -17,7 +17,7 @@ const Verification: React.FC = () => {
 
   const handleEmailVerify = async () => {
     try {
-      const response = await axios.post(`${apiUrl}/api/auth/verify-email`, { companyEmail, otp: emailOTP });
+      const response = await axios.post(apiUrl +  "/api/auth/verify-email", { companyEmail, otp: emailOTP });
       if (response.status === 200) {
         setEmailVerified(true);
         setError(null);
@@ -41,7 +41,7 @@ const Verification: React.FC = () => {
         return;
     }
     try {
-      const response = await axios.post(`${apiUrl}/api/auth/verify-mobile`, { phone, otp: mobileOTP });
+      const response = await axios.post(apiUrl +  "/api/auth/verify-mobile", { phone, otp: mobileOTP });
       if (response.status === 200) {
         setMobileVerified(true);
         setError(null);

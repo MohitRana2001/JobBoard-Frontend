@@ -30,7 +30,7 @@ const Dashboard: React.FC = () => {
                 return;
             }
             console.log("token", token);
-            const response = await axios.get(`${apiUrl}/api/jobs`,{
+            const response = await axios.get(apiUrl +  "/api/jobs",{
                 headers:{
                     'x-auth-token': token
                 }
