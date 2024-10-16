@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Briefcase, LogIn, LogOut } from 'lucide-react';
+import { LogIn, LogOut } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from '@/AuthContext';
 
@@ -23,8 +23,7 @@ const Header: React.FC = () => {
     <header className="bg-white shadow">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link to="/" className="flex items-center text-blue-600">
-          <Briefcase className="mr-2" />
-          <span className="text-xl font-bold">Cuvette</span>
+          <img src="/cuvette.svg" alt="Cuvette" className="w-full h-auto" />
         </Link>
         <nav className='flex items-center gap-4'>
           <Link to="/" className="text-gray-600 hover:text-gray-800">Contact</Link>
