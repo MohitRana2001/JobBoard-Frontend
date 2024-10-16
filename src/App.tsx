@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Header from './components/Header';
+import SignUp from './components/SignUp';
+import Verification from './components/Verification';
+import Dashboard from './components/Dashboard';
+import CreateJob from './components/CreateJob';
+import { AuthProvider, useAuth } from './AuthContext';
 
-function App() {
-  const [count, setCount] = useState(0)
+const ProtectedRoute: React.FC<{ element: React.ReactElement }> = ({ element }) => {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? element : <Navigate to="/" replace />;
+};
+
+function AppRoutes() {
+  const { isAuthenticated } = useAuth();
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Routes>
+      <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignUp />} />
+      <Route path="/verify" element={<Verification />} />
+      <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
+      <Route path="/create-job" element={<ProtectedRoute element={<CreateJob />} />} />
+    </Routes>
+  );
 }
 
-export default App
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <div className="min-h-screen bg-gray-100">
+          <Header />
+          <main className="container mx-auto px-4 py-8">
+            <AppRoutes />
+          </main>
+        </div>
+      </Router>
+    </AuthProvider>
+  );
+}
+
+export default App;
