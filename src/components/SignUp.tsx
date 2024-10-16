@@ -1,38 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import axios from 'axios';
-import { useAuth } from '../AuthContext';
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
-type FormData = {
-  name: string;
-  phone: string;
-  companyName: string;
-  companyEmail: string;
-  employeeSize: string;
-  password: string;
-};
+const signUpSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  phone: z.string().regex(/^\d{10}$/, 'Phone number must be 10 digits'),
+  companyName: z.string().min(2, 'Company name must be at least 2 characters'),
+  companyEmail: z.string().email('Invalid email address'),
+  employeeSize: z.number().min(1, 'Employee size must be at least 1'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+type FormData = z.infer<typeof signUpSchema>;
 
 const SignUp: React.FC = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    resolver: zodResolver(signUpSchema),
+  });
   const navigate = useNavigate();
-  const { login, setCompanyDetails } = useAuth();
+  const [error, setError] = useState<string | null>(null);
 
   const onSubmit = async (data: FormData) => {
     try {
       const response = await axios.post('http://localhost:4000/api/auth/register', data);
-      console.log('Company registered successfully:', response.data);
-      console.log(data);
-      if (response.data) {
-        console.log("Inside if");
-        const { token, ...companyDetails } = response.data;
-        setCompanyDetails(companyDetails);
-        login(token, companyDetails);
-        navigate('/verify');
+      if (response.status === 201) {
+        navigate('/verify', { state: { companyEmail: data.companyEmail, phone: data.phone } });
       }
-    } catch (error) {
-      console.error('Error registering company:', error);
-      // Handle error (e.g., show error message to the user)
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
+        setError(err.response.data.msg || 'An error occurred during registration');
+      } else {
+        setError('An unexpected error occurred');
+      }
     }
   };
 
@@ -40,70 +45,46 @@ const SignUp: React.FC = () => {
     <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
       <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
       <p className="text-gray-600 mb-6 text-center">Join our platform to post jobs and find great candidates</p>
+      {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="mb-4">
-          <input
-            type="text"
-            {...register('name', { required: 'Name is required' })}
-            placeholder="Name"
-            className="w-full px-3 py-2 border rounded-md"
-          />
-          {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="name">Name</Label>
+            <Input id="name" {...register('name')} placeholder="Name" />
+            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+          </div>
+          <div>
+            <Label htmlFor="phone">Phone</Label>
+            <Input id="phone" {...register('phone')} placeholder="Phone no." />
+            {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
+          </div>
+          <div>
+            <Label htmlFor="companyName">Company Name</Label>
+            <Input id="companyName" {...register('companyName')} placeholder="Company Name" />
+            {errors.companyName && <p className="text-red-500 text-sm mt-1">{errors.companyName.message}</p>}
+          </div>
+          <div>
+            <Label htmlFor="companyEmail">Company Email</Label>
+            <Input id="companyEmail" type="email" {...register('companyEmail')} placeholder="Company Email" />
+            {errors.companyEmail && <p className="text-red-500 text-sm mt-1">{errors.companyEmail.message}</p>}
+          </div>
+          <div>
+            <Label htmlFor="employeeSize">Employee Size</Label>
+            <Input id="employeeSize" type="number" {...register('employeeSize', { valueAsNumber: true })} placeholder="Employee Size" />
+            {errors.employeeSize && <p className="text-red-500 text-sm mt-1">{errors.employeeSize.message}</p>}
+          </div>
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <Input id="password" type="password" {...register('password')} placeholder="Password" />
+            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+          </div>
         </div>
-        <div className="mb-4">
-          <input
-            type="tel"
-            {...register('phone', { required: 'Phone number is required' })}
-            placeholder="Phone no."
-            className="w-full px-3 py-2 border rounded-md"
-          />
-          {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
-        </div>
-        <div className="mb-4">
-          <input
-            type="text"
-            {...register('companyName', { required: 'Company name is required' })}
-            placeholder="Company Name"
-            className="w-full px-3 py-2 border rounded-md"
-          />
-          {errors.companyName && <p className="text-red-500 text-sm mt-1">{errors.companyName.message}</p>}
-        </div>
-        <div className="mb-4">
-          <input
-            type="email"
-            {...register('companyEmail', { required: 'Company email is required' })}
-            placeholder="Company Email"
-            className="w-full px-3 py-2 border rounded-md"
-          />
-          {errors.companyEmail && <p className="text-red-500 text-sm mt-1">{errors.companyEmail.message}</p>}
-        </div>
-        <div className="mb-6">
-          <input
-            type="number"
-            {...register('employeeSize', { required: 'Employee size is required' })}
-            placeholder="Employee Size"
-            className="w-full px-3 py-2 border rounded-md"
-          />
-          {errors.employeeSize && <p className="text-red-500 text-sm mt-1">{errors.employeeSize.message}</p>}
-        </div>
-        <div className="mb-6">
-          <input
-            type="password"
-            {...register('password', { required: 'Password is required', minLength: 8 })}
-            placeholder="Password"
-            className="w-full px-3 py-2 border rounded-md"
-          />
-        {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300"
-        >
-          Proceed
-        </button>
+        <Button type="submit" className="w-full mt-6">
+          Sign Up
+        </Button>
       </form>
       <p className="text-sm text-center mt-4 text-gray-600">
-        By clicking on proceed you will accept our Terms & Conditions
+        By clicking on Sign Up you will accept our Terms & Conditions
       </p>
     </div>
   );

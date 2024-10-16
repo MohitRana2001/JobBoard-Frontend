@@ -1,19 +1,17 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Briefcase, LogOut } from 'lucide-react';
-import { useAuth } from '../AuthContext';
+import { Button } from './ui/button';
+import { useAuth } from '@/AuthContext';
 
 const Header: React.FC = () => {
-  const { isAuthenticated, setIsAuthenticated } = useAuth();
+
+    const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Clear authentication token from localStorage
-    localStorage.removeItem('authToken');
-    // Update authentication state
-    setIsAuthenticated(false);
-    // Redirect to home page
-    navigate('/');
+    logout();
+    navigate('/login');
   };
 
   return (
@@ -23,17 +21,19 @@ const Header: React.FC = () => {
           <Briefcase className="mr-2" />
           <span className="text-xl font-bold">Cuvette</span>
         </Link>
-        <nav className="flex items-center">
-          <Link to="/contact" className="text-gray-600 hover:text-gray-800 mr-4">Contact</Link>
-          {isAuthenticated && (
-            <button
+        <nav className='flex items-center gap-4'>
+          <Link to="/contact" className="text-gray-600 hover:text-gray-800">Contact</Link>
+          
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleLogout}
-              className="flex items-center text-gray-600 hover:text-gray-800"
+              className="flex items-center"
             >
-              <LogOut className="mr-1" size={18} />
+              <LogOut className="mr-2 h-4 w-4" />
               Logout
-            </button>
-          )}
+            </Button>
+          
         </nav>
       </div>
     </header>

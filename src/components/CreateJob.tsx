@@ -4,6 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { X } from 'lucide-react';
 import { format } from 'date-fns';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 type FormData = {
   jobTitle: string;
@@ -16,19 +17,35 @@ export default function CreateJob() {
   const { register, handleSubmit, control, formState: { errors } } = useForm<FormData>();
   const [candidates, setCandidates] = useState<string[]>([]);
   const [newCandidate, setNewCandidate] = useState('');
+  const [err, setErr] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     console.log({ ...data, candidates });
-    // TODO: Implement API call to create job posting
-    axios.post('http://localhost:4000/api/jobs', { ...data, candidates })
-      .then(response => {
-        console.log('Job posting created successfully:', response.data);
-        // Optionally, you can redirect the user to the dashboard or show a success message
-      })
-      .catch(error => {
-        console.error('Error creating job posting:', error);
-        // Handle error (e.g., show error message to the user)
+    try{
+        const token = localStorage.getItem('token');
+        if(!token){
+            navigate('/login');
+            return;
+        }
+        console.log(token);
+        const response = await axios.post('http://localhost:4000/api/jobs',{...data,candidates},{
+            headers:{
+                'x-auth-token': token
+            }
         });
+        console.log(response.data);
+        if(response.status === 201){
+            navigate('/dashboard');
+        }
+    }catch(err){
+        if (axios.isAxiosError(err) && err.response) {
+            setErr(err.response.data.msg || 'Failed to create job posting');
+          } else {
+            setErr('An unexpected error occurred');
+          }
+    }
+    
   };
   const addCandidate = () => {
     if (newCandidate && !candidates.includes(newCandidate)) {

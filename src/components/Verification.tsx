@@ -1,64 +1,59 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from '../AuthContext';
 
 const Verification: React.FC = () => {
-  const { companyDetails, setIsAuthenticated } = useAuth();
   const [emailOTP, setEmailOTP] = useState('');
   const [mobileOTP, setMobileOTP] = useState('');
   const [emailVerified, setEmailVerified] = useState(false);
   const [mobileVerified, setMobileVerified] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { companyEmail, phone } = location.state as { companyEmail: string; phone: string };
 
-  useEffect(() => {
-    console.log('Company details in Verification:', companyDetails.companyEmail);
-  }, [companyDetails]);
-
-  const handleEmailVerify = () => {
-    axios.post('http://localhost:4000/api/auth/verify-email', { 
-      companyEmail: companyDetails.companyEmail, 
-      otp: emailOTP 
-    })
-      .then(response => {
-        console.log('Email OTP verified successfully:', response.data);
+  const handleEmailVerify = async () => {
+    try {
+      const response = await axios.post('http://localhost:4000/api/auth/verify-email', { companyEmail, otp: emailOTP });
+      if (response.status === 200) {
         setEmailVerified(true);
-        setError('');
-        if (emailVerified) {
-          setIsAuthenticated(true);
-          navigate('/dashboard');
-        }
-      })
-      .catch(error => {
-        console.error(`Error verifying email OTP: ${companyDetails} ${emailOTP}`, error );
-        setError('Error verifying email OTP. Please try again.');
-      });
+        setError(null);
+      }
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
+        setError(err.response.data.msg || 'Email verification failed');
+      } else {
+        setError('An unexpected error occurred');
+      }
+    }
   };
 
-  const handleMobileVerify = () => {
-    axios.post('http://localhost:4000/api/auth/verify-mobile', { phone: companyDetails.phone, otp: mobileOTP })
-      .then(response => {
-        console.log('Mobile OTP verified successfully:', response.data);
+  const handleMobileVerify = async () => {
+    try {
+      const response = await axios.post('http://localhost:4000/api/auth/verify-mobile', { phone, otp: mobileOTP });
+      if (response.status === 200) {
         setMobileVerified(true);
-        setError(''); // Clear any previous error
-      })
-      .catch(error => {
-        console.error('Error verifying mobile OTP:', error);
-        setError(`Error verifying mobile OTP. Please try again. ${companyDetails.phone}`);
-      });
+        setError(null);
+      }
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
+        setError(err.response.data.msg || 'Mobile verification failed');
+      } else {
+        setError('An unexpected error occurred');
+      }
+    }
   };
 
   const handleComplete = () => {
     if (emailVerified && mobileVerified) {
-      navigate('/dashboard');
+      navigate('/login');
     }
   };
 
   return (
     <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
       <h2 className="text-2xl font-bold mb-6 text-center">Verify Your Account</h2>
-      {error && <p className="text-red-600 mb-4 text-center">{error}</p>}
+      {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
       <div className="mb-6">
         <label className="block text-gray-700 mb-2">Email OTP</label>
         <div className="flex">
@@ -76,7 +71,6 @@ const Verification: React.FC = () => {
           >
             {emailVerified ? 'Verified' : 'Verify'}
           </button>
-          
         </div>
       </div>
       <div className="mb-6">
@@ -105,7 +99,6 @@ const Verification: React.FC = () => {
       >
         Complete Verification
       </button>
-      <p>{companyDetails.companyEmail} {emailOTP}</p>
     </div>
   );
 };
