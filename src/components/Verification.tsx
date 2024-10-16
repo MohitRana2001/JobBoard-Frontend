@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { useToast } from '@/hooks/use-toast';
 
 const Verification: React.FC = () => {
   const [emailOTP, setEmailOTP] = useState('');
@@ -10,6 +11,7 @@ const Verification: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const {toast} = useToast();
   const { companyEmail, phone } = location.state as { companyEmail: string; phone: string };
 
   const handleEmailVerify = async () => {
@@ -18,6 +20,10 @@ const Verification: React.FC = () => {
       if (response.status === 200) {
         setEmailVerified(true);
         setError(null);
+        toast({
+            title: 'Email Verified',
+            description: 'Email verification successful',
+        })
       }
     } catch (err) {
       if (axios.isAxiosError(err) && err.response) {
@@ -29,11 +35,16 @@ const Verification: React.FC = () => {
   };
 
   const handleMobileVerify = async () => {
+    if (!mobileOTP) {
+        alert('Please entry any number to continue [Twillio trial account doesnt support unverified numbers]')
+        return;
+    }
     try {
       const response = await axios.post('http://localhost:4000/api/auth/verify-mobile', { phone, otp: mobileOTP });
       if (response.status === 200) {
         setMobileVerified(true);
         setError(null);
+        
       }
     } catch (err) {
       if (axios.isAxiosError(err) && err.response) {

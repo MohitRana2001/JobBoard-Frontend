@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import axios from 'axios';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface CompanyDetails {
   name: string;
@@ -30,34 +29,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   });
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    const storedDetails = localStorage.getItem('companyDetails');
-    if (token && storedDetails) {
-      // Verify token with the backend
-      axios.get('http://localhost:4000/api/auth/verify-token', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-        .then(() => {
-          setIsAuthenticated(true);
-          setCompanyDetails(JSON.parse(storedDetails));
-        })
-        .catch(() => {
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('companyDetails');
-        });
-    }
-  }, []);
-
   const login = (token: string, details: CompanyDetails) => {
-    localStorage.setItem('authToken', token);
+    localStorage.setItem('token', token);
     localStorage.setItem('companyDetails', JSON.stringify(details));
     setIsAuthenticated(true);
     setCompanyDetails(details);
   };
 
   const logout = () => {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('token');
     localStorage.removeItem('companyDetails');
     setIsAuthenticated(false);
     setCompanyDetails({

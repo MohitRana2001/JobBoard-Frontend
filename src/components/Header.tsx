@@ -1,17 +1,22 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Briefcase, LogOut } from 'lucide-react';
+import { Briefcase, LogIn, LogOut } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from '@/AuthContext';
 
 const Header: React.FC = () => {
+  const { logout } = useAuth();
 
-    const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
+  };
+
+  const isAuthenticated = () => {
+    const token = localStorage.getItem('token');
+    return !!token;  // Returns true if token exists, false otherwise
   };
 
   return (
@@ -22,8 +27,8 @@ const Header: React.FC = () => {
           <span className="text-xl font-bold">Cuvette</span>
         </Link>
         <nav className='flex items-center gap-4'>
-          <Link to="/contact" className="text-gray-600 hover:text-gray-800">Contact</Link>
-          
+          <Link to="/" className="text-gray-600 hover:text-gray-800">Contact</Link>
+          {isAuthenticated() ? (
             <Button
               variant="outline"
               size="sm"
@@ -33,7 +38,17 @@ const Header: React.FC = () => {
               <LogOut className="mr-2 h-4 w-4" />
               Logout
             </Button>
-          
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/login')}
+              className="flex items-center"
+            >
+              <LogIn className="mr-2 h-4 w-4" />
+              Login
+            </Button>
+          )}
         </nav>
       </div>
     </header>

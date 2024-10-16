@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,24 +6,32 @@ import * as z from 'zod';
 import axios from 'axios';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 
 const signUpSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   phone: z.string().regex(/^\d{10}$/, 'Phone number must be 10 digits'),
   companyName: z.string().min(2, 'Company name must be at least 2 characters'),
   companyEmail: z.string().email('Invalid email address'),
-  employeeSize: z.number().min(1, 'Employee size must be at least 1'),
+  employeeSize: z.number().min(1, 'Employee size is required'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 type FormData = z.infer<typeof signUpSchema>;
 
 const SignUp: React.FC = () => {
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if(token){
+            navigate('/dashboard');
+        }
+    }, [navigate]);
+
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(signUpSchema),
   });
-  const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
 
   const onSubmit = async (data: FormData) => {
@@ -49,42 +57,36 @@ const SignUp: React.FC = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-4">
           <div>
-            <Label htmlFor="name">Name</Label>
             <Input id="name" {...register('name')} placeholder="Name" />
             {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
           </div>
           <div>
-            <Label htmlFor="phone">Phone</Label>
             <Input id="phone" {...register('phone')} placeholder="Phone no." />
             {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
           </div>
           <div>
-            <Label htmlFor="companyName">Company Name</Label>
             <Input id="companyName" {...register('companyName')} placeholder="Company Name" />
             {errors.companyName && <p className="text-red-500 text-sm mt-1">{errors.companyName.message}</p>}
           </div>
           <div>
-            <Label htmlFor="companyEmail">Company Email</Label>
             <Input id="companyEmail" type="email" {...register('companyEmail')} placeholder="Company Email" />
             {errors.companyEmail && <p className="text-red-500 text-sm mt-1">{errors.companyEmail.message}</p>}
           </div>
           <div>
-            <Label htmlFor="employeeSize">Employee Size</Label>
-            <Input id="employeeSize" type="number" {...register('employeeSize', { valueAsNumber: true })} placeholder="Employee Size" />
+            <Input id="employeeSize" type='number'{...register('employeeSize', { valueAsNumber: true })} placeholder="Employee Size" />
             {errors.employeeSize && <p className="text-red-500 text-sm mt-1">{errors.employeeSize.message}</p>}
           </div>
           <div>
-            <Label htmlFor="password">Password</Label>
             <Input id="password" type="password" {...register('password')} placeholder="Password" />
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
           </div>
         </div>
         <Button type="submit" className="w-full mt-6">
-          Sign Up
+          Proceed
         </Button>
       </form>
       <p className="text-sm text-center mt-4 text-gray-600">
-        By clicking on Sign Up you will accept our Terms & Conditions
+        By clicking on proceed you will accept our Terms & Conditions
       </p>
     </div>
   );

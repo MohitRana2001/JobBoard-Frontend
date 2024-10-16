@@ -28,7 +28,7 @@ const Dashboard: React.FC = () => {
                 setError('No token found');
                 return;
             }
-
+            console.log("token", token);
             const response = await axios.get('http://localhost:4000/api/jobs',{
                 headers:{
                     'x-auth-token': token

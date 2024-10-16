@@ -11,6 +11,7 @@ type FormData = {
   jobDescription: string;
   experienceLevel: string;
   endDate: string;
+  candidates: string[];
 };
 
 export default function CreateJob() {
