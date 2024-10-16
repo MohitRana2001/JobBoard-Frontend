@@ -5,11 +5,7 @@ import Verification from './components/Verification';
 import Dashboard from './components/Dashboard';
 import CreateJob from './components/CreateJob';
 import { AuthProvider, useAuth } from './AuthContext';
-
-const ProtectedRoute: React.FC<{ element: React.ReactElement }> = ({ element }) => {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? element : <Navigate to="/" replace />;
-};
+import Login from './components/Login';
 
 function AppRoutes() {
   const { isAuthenticated } = useAuth();
@@ -18,8 +14,9 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignUp />} />
       <Route path="/verify" element={<Verification />} />
-      <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
-      <Route path="/create-job" element={<ProtectedRoute element={<CreateJob />} />} />
+      <Route path="/dashboard" element={<Dashboard  />} />
+      <Route path="/create-job" element={<CreateJob />} />
+      <Route path="/login" element={<Login />} />
     </Routes>
   );
 }
