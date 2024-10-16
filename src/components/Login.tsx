@@ -16,6 +16,7 @@ const loginSchema = z.object({
 type FormData = z.infer<typeof loginSchema>;
 
 const Login: React.FC = () => {
+    const apiUrl = import.meta.env.VITE_BACKEND_URL;
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(loginSchema),
   });
@@ -24,7 +25,7 @@ const Login: React.FC = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await axios.post('http://localhost:4000/api/auth/login', data);
+      const response = await axios.post(`${apiUrl}/api/auth/login`, data);
       console.log(response.data);
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);

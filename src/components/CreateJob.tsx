@@ -14,6 +14,7 @@ type FormData = {
 };
 
 export default function CreateJob() {
+    const apiUrl = import.meta.env.VITE_BACKEND_URL;
   const { register, handleSubmit, control, formState: { errors } } = useForm<FormData>();
   const [candidates, setCandidates] = useState<string[]>([]);
   const [newCandidate, setNewCandidate] = useState('');
@@ -32,7 +33,7 @@ export default function CreateJob() {
             return;
         }
         console.log(token);
-        const response = await axios.post('http://localhost:4000/api/jobs',{...data,candidates},{
+        const response = await axios.post(`${apiUrl}/api/jobs`,{...data,candidates},{
             headers:{
                 'x-auth-token': token
             }

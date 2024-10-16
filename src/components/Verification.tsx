@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useToast } from '@/hooks/use-toast';
 
 const Verification: React.FC = () => {
+    const apiUrl = import.meta.env.VITE_BACKEND_URL;
   const [emailOTP, setEmailOTP] = useState('');
   const [mobileOTP, setMobileOTP] = useState('');
   const [emailVerified, setEmailVerified] = useState(false);
@@ -16,7 +17,7 @@ const Verification: React.FC = () => {
 
   const handleEmailVerify = async () => {
     try {
-      const response = await axios.post('http://localhost:4000/api/auth/verify-email', { companyEmail, otp: emailOTP });
+      const response = await axios.post(`${apiUrl}/api/auth/verify-email`, { companyEmail, otp: emailOTP });
       if (response.status === 200) {
         setEmailVerified(true);
         setError(null);
@@ -40,7 +41,7 @@ const Verification: React.FC = () => {
         return;
     }
     try {
-      const response = await axios.post('http://localhost:4000/api/auth/verify-mobile', { phone, otp: mobileOTP });
+      const response = await axios.post(`${apiUrl}/api/auth/verify-mobile`, { phone, otp: mobileOTP });
       if (response.status === 200) {
         setMobileVerified(true);
         setError(null);

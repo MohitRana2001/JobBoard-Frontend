@@ -19,6 +19,7 @@ const signUpSchema = z.object({
 type FormData = z.infer<typeof signUpSchema>;
 
 const SignUp: React.FC = () => {
+    const apiUrl = import.meta.env.VITE_BACKEND_URL;
 
     const navigate = useNavigate();
 
@@ -36,7 +37,7 @@ const SignUp: React.FC = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await axios.post('http://localhost:4000/api/auth/register', data);
+      const response = await axios.post(`${apiUrl}/api/auth/register`, data);
       if (response.status === 201) {
         navigate('/verify', { state: { companyEmail: data.companyEmail, phone: data.phone } });
       }

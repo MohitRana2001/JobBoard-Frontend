@@ -15,6 +15,7 @@ interface Job{
 }
 
 const Dashboard: React.FC = () => {
+    const apiUrl = import.meta.env.VITE_BACKEND_URL;
     const [jobs, setJobs] = useState<Job[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
@@ -29,7 +30,7 @@ const Dashboard: React.FC = () => {
                 return;
             }
             console.log("token", token);
-            const response = await axios.get('http://localhost:4000/api/jobs',{
+            const response = await axios.get(`${apiUrl}/api/jobs`,{
                 headers:{
                     'x-auth-token': token
                 }
